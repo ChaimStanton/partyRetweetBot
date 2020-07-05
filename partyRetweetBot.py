@@ -53,10 +53,11 @@ users = ["1268410636553371648"]
 # class for the stream 
 class MyStreamListener(tweepy.StreamListener):
     def on_status(self, status):
-        print(status.text)
         # status.retweet()
         try:
             api.retweet(status.__dict__["_json"]["id"])
+            print(status.text)
+            print(status._json["retweeted_status"])
         except tweepy.TweepError as error:
             print(error.reason)
 
