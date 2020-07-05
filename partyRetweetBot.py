@@ -2,56 +2,75 @@
 
 from keysAuthentication import *
 
+import requests
+import urllib3
+
 import tweepy
 from time import sleep
 
-# auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-# auth.set_access_token(access_token, access_token_secret)
+# "new" authenticaiotn
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
 
-# api = tweepy.API(auth)
+api = tweepy.API(auth)
 
-auth = tweepy.AppAuthHandler(consumer_key, consumer_secret)
+"""
+# Auth 1 authenticaton
+try:
+    redirect_url = auth.get_authorization_url()
+except tweepy.TweepError:
+    print('Error! Failed to get request token.')
 
-api=tweepy.API(auth)
+print("go to this link", redirect_url)
+
+verifier = int(input('Verifier:'))
 
 
-# since_id = 1273073579786211330
-# since_id = 1
+s = requests.Session()
+# s.set("a")
+
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+token = s.get(redirect_url)
+s.delete(redirect_url)
+# auth.request_token = { 'oauth_token' : token,
+#                          'oauth_token_secret' : verifier }
+
+auth.request_token = {
+      'oauth_token': s.get(token.url),
+      'oauth_token_secret': verifier
+}
+
+# try:
+auth.get_access_token(str(verifier))
+print("yay")
+# except tweepy.TweepError:
+#     print('Error! Failed to get access token.')
+"""
 
 users = ["1268410636553371648"]
 
 # --- USING THE STREAMING METHOD --- 
 # class for the stream 
-class MyStreamListner(tweepy.StreamListener):
+class MyStreamListener(tweepy.StreamListener):
     def on_status(self, status):
         print(status.text)
-        status.retweet()
+        # status.retweet()
+        try:
+            api.retweet(status.__dict__["_json"]["id"])
+        except tweepy.TweepError as error:
+            print(error.reason)
+
+    def on_error(self, status_code):
+        print(status_code)
+        return False
 
 #creating and initialising the stream
-myStreamListner = MyStreamListner()
-myStream = tweepy.Stream(auth= auth, listener=myStreamListner)
+myStreamListener = MyStreamListener()
+# myStream = tweepy.Stream(auth= api.auth, listener=myStreamListener)
+
+myStream = tweepy.Stream(auth= auth, listener=myStreamListener)
+
 
 # starting the stream
 myStream.filter(follow=users)
 
-
-# --- USING THE OLD FASHIONED METHOD ---
-# # Below is using the old fashioned method
-# with open("since_id.txt", "r") as txtFile:
-#     since_id = int(txtFile.read())
-
-# while True:
-#     print ("NEW loop for program")
-#     for user in users:
-#         result = api.user_timeline(user, since_id=(since_id))
-#         for tweet in result:
-#             print("NEW for loop for the result")
-#             print(tweet.text, tweet.id) # this prints it out for debugging purposes
-#             # tweet.retweet()
-#         if result.since_id == None: #bc if nothing gets tweeted then it returns none
-#             pass 
-#         else:
-#             since_id = result.since_id
-#             with open("since_id.txt", "w") as txtFile:
-#                 txtFile.write(str(since_id))
-#         sleep(5)
