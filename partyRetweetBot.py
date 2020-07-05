@@ -21,7 +21,10 @@ class MyStreamListener(tweepy.StreamListener):
         try:
             tweet.retweet()
             print(status.text)
-            print(tweet.isPureRetweet)
+            print("pure retweet:", tweet.isPureRetweet)
+            print("pure tweet: ", tweet.isPureTweet)
+            print("quote retweet:", tweet.isQuoteRetweet)
+            
         except tweepy.TweepError as error:
             print(error.reason)
 
@@ -34,8 +37,15 @@ class Tweet():
     """ A class for all of the tweets to make life easier """
     def __init__(self, statusObj):
         self.id = statusObj.__dict__["_json"]["id"]
-        self.isPureRetweet = does_have_value(status._json, "retweeted_status")
+        self.isPureRetweet = does_have_value(statusObj._json, "retweeted_status")
         # a pure retweet is a retweet with no comment
+        self.isQuoteRetweet = does_have_value(statusObj._json, "quoted_status")
+        # a quoted tweet is one that has a comment AND a retweet 
+        if self.isQuoteRetweet == False and self.isPureRetweet == False:
+            self.isPureTweet = True 
+        else:
+            self.isPureTweet = False 
+        # a pure tweet is a completley not retweeted tweet and original
 
     def retweet(self):
         api.retweet(self.id)
