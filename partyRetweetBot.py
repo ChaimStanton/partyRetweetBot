@@ -16,15 +16,22 @@ api = tweepy.API(auth)
 
 users = ["1268410636553371648"]
 
+def does_have_value(jsonObject, keyvalue):
+    try:
+        jsonObject[keyvalue]
+        return True
+    except KeyError:
+        return False 
+
 # --- USING THE STREAMING METHOD --- 
 # class for the stream 
 class MyStreamListener(tweepy.StreamListener):
     def on_status(self, status):
-        # status.retweet()
+        tweet = Tweet(status)
         try:
-            api.retweet(status.__dict__["_json"]["id"])
+            tweet.retweet()
             print(status.text)
-            print(status._json["retweeted_status"])
+            print(tweet.isPureRetweet)
         except tweepy.TweepError as error:
             print(error.reason)
 
@@ -32,12 +39,19 @@ class MyStreamListener(tweepy.StreamListener):
         print(status_code)
         return False
 
+class Tweet():
+    """ A class for all of the tweets to make life easier """
+    def __init__(self, statusObj):
+        self.id = statusObj.__dict__["_json"]["id"]
+        self.isPureRetweet = does_have_value(status._json, "retweeted_status") # a pure retweet is a retweet with no comment
+
+    def retweet(self):
+        api.retweet(self.id)
+
 #creating and initialising the stream
 myStreamListener = MyStreamListener()
-# myStream = tweepy.Stream(auth= api.auth, listener=myStreamListener)
 
 myStream = tweepy.Stream(auth= auth, listener=myStreamListener)
-
 
 # starting the stream
 myStream.filter(follow=users)
