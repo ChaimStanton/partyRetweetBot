@@ -8,7 +8,9 @@ from time import sleep
 
 def does_have_value(jsonObject, keyvalue):
     try:
-        jsonObject[keyvalue]
+        jsonObject[keyvalue] # see if it exists
+        if jsonObject[keyvalue] == None:
+            return False 
         return True
     except KeyError:
         return False
@@ -17,14 +19,21 @@ def does_have_value(jsonObject, keyvalue):
 class MyStreamListener(tweepy.StreamListener):
     """This is a class for the stream """
     def on_status(self, status):
+        print("\nNEW TWEET")
         tweet = Tweet(status)
         try:
-            tweet.retweet()
-            print(status.text)
-            print("pure retweet:", tweet.isPureRetweet)
-            print("pure tweet: ", tweet.isPureTweet)
-            print("quote retweet:", tweet.isQuoteRetweet)
+            if tweet.isComment == True or tweet.isPureRetweet == True:
+                print("NOT RETWETED ")
+            else:
+                tweet.retweet()
+                print("THIS WAS RETWEETED")
             
+            print("text                ", status.text)
+            print("quote retweet:      ", tweet.isQuoteRetweet)
+            print("pure retweet:       ", tweet.isPureRetweet)
+            print("comment tweet:      ", tweet.isComment)
+            print()
+
         except tweepy.TweepError as error:
             print(error.reason)
 
@@ -41,11 +50,7 @@ class Tweet():
         # a pure retweet is a retweet with no comment
         self.isQuoteRetweet = does_have_value(statusObj._json, "quoted_status")
         # a quoted tweet is one that has a comment AND a retweet 
-        if self.isQuoteRetweet == False and self.isPureRetweet == False:
-            self.isPureTweet = True 
-        else:
-            self.isPureTweet = False 
-        # a pure tweet is a completley not retweeted tweet and original
+        self.isComment = does_have_value(statusObj._json, "in_reply_to_status_id")
 
     def retweet(self):
         api.retweet(self.id)
@@ -57,7 +62,7 @@ auth.set_access_token(access_token, access_token_secret)
 
 api = tweepy.API(auth)
 
-users = ["1268410636553371648"]
+users = ["1268410636553371648", "1279585853942239243"]
 
 # creating and initializing the stream
 myStreamListener = MyStreamListener()
