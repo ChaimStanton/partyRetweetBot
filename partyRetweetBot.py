@@ -2,61 +2,38 @@
 
 from keysAuthentication import *
 
-import requests
-import urllib3
-
 import tweepy
 from time import sleep
 
-# "new" authenticaiotn
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_token_secret)
 
-api = tweepy.API(auth)
-
-"""
-# Auth 1 authenticaton
-try:
-    redirect_url = auth.get_authorization_url()
-except tweepy.TweepError:
-    print('Error! Failed to get request token.')
-
-print("go to this link", redirect_url)
-
-verifier = int(input('Verifier:'))
+def does_have_value(jsonObject, keyvalue):
+    try:
+        jsonObject[keyvalue] # see if it exists
+        if jsonObject[keyvalue] == None:
+            return False 
+        return True
+    except KeyError:
+        return False
 
 
-s = requests.Session()
-# s.set("a")
-
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-token = s.get(redirect_url)
-s.delete(redirect_url)
-# auth.request_token = { 'oauth_token' : token,
-#                          'oauth_token_secret' : verifier }
-
-auth.request_token = {
-      'oauth_token': s.get(token.url),
-      'oauth_token_secret': verifier
-}
-
-# try:
-auth.get_access_token(str(verifier))
-print("yay")
-# except tweepy.TweepError:
-#     print('Error! Failed to get access token.')
-"""
-
-users = ["1268410636553371648"]
-
-# --- USING THE STREAMING METHOD --- 
-# class for the stream 
 class MyStreamListener(tweepy.StreamListener):
+    """This is a class for the stream """
     def on_status(self, status):
-        print(status.text)
-        # status.retweet()
+        print("\nNEW TWEET")
+        tweet = Tweet(status)
         try:
-            api.retweet(status.__dict__["_json"]["id"])
+            if tweet.isComment == True or tweet.isPureRetweet == True:
+                print("NOT RETWETED ")
+            else:
+                tweet.retweet()
+                print("THIS WAS RETWEETED")
+            
+            print("text                ", status.text)
+            print("quote retweet:      ", tweet.isQuoteRetweet)
+            print("pure retweet:       ", tweet.isPureRetweet)
+            print("comment tweet:      ", tweet.isComment)
+            print()
+
         except tweepy.TweepError as error:
             print(error.reason)
 
@@ -64,13 +41,33 @@ class MyStreamListener(tweepy.StreamListener):
         print(status_code)
         return False
 
-#creating and initialising the stream
+
+class Tweet():
+    """ A class for all of the tweets to make life easier """
+    def __init__(self, statusObj):
+        self.id = statusObj.__dict__["_json"]["id"]
+        self.isPureRetweet = does_have_value(statusObj._json, "retweeted_status")
+        # a pure retweet is a retweet with no comment
+        self.isQuoteRetweet = does_have_value(statusObj._json, "quoted_status")
+        # a quoted tweet is one that has a comment AND a retweet 
+        self.isComment = does_have_value(statusObj._json, "in_reply_to_status_id")
+
+    def retweet(self):
+        api.retweet(self.id)
+
+
+# "new" authenticaiotn
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
+
+api = tweepy.API(auth)
+
+users = ["1268410636553371648", "1279585853942239243"]
+
+# creating and initializing the stream
 myStreamListener = MyStreamListener()
-# myStream = tweepy.Stream(auth= api.auth, listener=myStreamListener)
 
-myStream = tweepy.Stream(auth= auth, listener=myStreamListener)
-
+myStream = tweepy.Stream(auth=auth, listener=myStreamListener)
 
 # starting the stream
 myStream.filter(follow=users)
-
