@@ -1,4 +1,4 @@
-#! python3
+#!python3
 
 import tweepy
 from time import sleep
