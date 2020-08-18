@@ -5,6 +5,11 @@ from time import sleep
 
 from tinydb import TinyDB
 
+import sys
+
+keysString = sys.argv[1]
+mpDBstr = sys.argv[2]
+
 def does_have_value(jsonObject, keyvalue):
     """This is a generic function just to see if a json object exists used to determine if somehting is a retweet"""
     try:
@@ -57,7 +62,8 @@ class Tweet():
 
 
 # getting authentication from database
-db = TinyDB("db/libDemKEYS.json")
+# keysString = "db/libDemKEYS.json"
+db = TinyDB(keysString)
 
 consumer_key = db.all()[0]["consumer_key"]
 consumer_secret = db.all()[1]["consumer_secret"]
@@ -71,7 +77,8 @@ auth.set_access_token(access_token, access_token_secret)
 
 api = tweepy.API(auth)
 
-db = TinyDB("db/libDem.json") # get the database 
+# mpDBstr = "db/libDem.json"
+db = TinyDB(mpDBstr) # get the database 
 
 mps = []
 
