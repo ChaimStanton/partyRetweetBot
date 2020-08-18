@@ -1,7 +1,5 @@
 #! python3
 
-from keysAuthentication import *
-
 import tweepy
 from time import sleep
 
@@ -56,6 +54,13 @@ class Tweet():
 
     def retweet(self):
         api.retweet(self.id)
+
+db = TinyDB("db/libDemKEYS.json")
+
+consumer_key = db.all()[0]["consumer_key"]
+consumer_secret = db.all()[1]["consumer_secret"]
+access_token = db.all()[2]["access_token"]
+access_token_secret = db.all()[3]["access_token_secret"]
 
 
 # "new" authenticaiotn
