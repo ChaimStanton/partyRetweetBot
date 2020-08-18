@@ -8,6 +8,7 @@ from time import sleep
 from tinydb import TinyDB
 
 def does_have_value(jsonObject, keyvalue):
+    """This is a generic function just to see if a json object exists used to determine if somehting is a retweet"""
     try:
         jsonObject[keyvalue] # see if it exists
         if jsonObject[keyvalue] == None:
@@ -30,9 +31,9 @@ class MyStreamListener(tweepy.StreamListener):
                 print("THIS WAS RETWEETED")
             
             print("text                ", status.text)
-            print("quote retweet:      ", tweet.isQuoteRetweet)
-            print("pure retweet:       ", tweet.isPureRetweet)
-            print("comment tweet:      ", tweet.isComment)
+            print("quote retweet:      ", tweet.isQuoteRetweet) # a retweet with a comment
+            print("pure retweet:       ", tweet.isPureRetweet) # i.e. a pure retweet with no comment
+            print("comment tweet:      ", tweet.isComment) # a retweet that is a retweet of a comment
             print()
 
         except tweepy.TweepError as error:
@@ -63,7 +64,7 @@ auth.set_access_token(access_token, access_token_secret)
 
 api = tweepy.API(auth)
 
-db = TinyDB("db/libDem.json")
+db = TinyDB("db/libDem.json") # get the database 
 
 mps = []
 
