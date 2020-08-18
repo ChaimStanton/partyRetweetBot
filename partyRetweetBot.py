@@ -5,6 +5,7 @@ from keysAuthentication import *
 import tweepy
 from time import sleep
 
+from tinydb import TinyDB
 
 def does_have_value(jsonObject, keyvalue):
     try:
@@ -62,10 +63,15 @@ auth.set_access_token(access_token, access_token_secret)
 
 api = tweepy.API(auth)
 
-users = ["1268410636553371648", "1279585853942239243"]
+db = TinyDB("db/libDem.json")
 
-for user in users:
-    api.create_friendship(user)
+mps = []
+
+for mp in db: # iterates through the database and adds the idstring to a list
+   mps.append(mp["id_str"])
+
+for mp in mps: 
+    api.create_friendship(mp) # follows each mp
 
 # creating and initializing the stream
 myStreamListener = MyStreamListener()
@@ -73,4 +79,4 @@ myStreamListener = MyStreamListener()
 myStream = tweepy.Stream(auth=auth, listener=myStreamListener)
 
 # starting the stream
-myStream.filter(follow=users)
+myStream.filter(follow=mps)
