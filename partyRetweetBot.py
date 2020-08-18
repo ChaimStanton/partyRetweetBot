@@ -55,6 +55,8 @@ class Tweet():
     def retweet(self):
         api.retweet(self.id)
 
+
+# getting authentication from database
 db = TinyDB("db/libDemKEYS.json")
 
 consumer_key = db.all()[0]["consumer_key"]
