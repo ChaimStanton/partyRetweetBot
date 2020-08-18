@@ -85,13 +85,21 @@ mps = []
 for mp in db: # iterates through the database and adds the idstring to a list
    mps.append(mp["id_str"])
 
-for mp in mps: 
-    api.create_friendship(mp) # follows each mp
+try:
+    for mp in mps: 
+        api.create_friendship(mp) # follows each mp
+except tweepy.error.TweepError:
+    print("already followed")
 
 # creating and initializing the stream
 myStreamListener = MyStreamListener()
 
 myStream = tweepy.Stream(auth=auth, listener=myStreamListener)
 
+print("Starting stream")
 # starting the stream
-myStream.filter(follow=mps)
+try:
+    myStream.filter(follow=mps)
+
+except:
+    print ("error")
