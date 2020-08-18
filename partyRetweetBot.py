@@ -64,6 +64,9 @@ api = tweepy.API(auth)
 
 users = ["1268410636553371648", "1279585853942239243"]
 
+for user in users:
+    api.create_friendship(user)
+
 # creating and initializing the stream
 myStreamListener = MyStreamListener()
 
