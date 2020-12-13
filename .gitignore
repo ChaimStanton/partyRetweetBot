@@ -1,7 +1,6 @@
 .vscode/
 since_id.txt
 tempCodeRunnerFile.py
-*KEYS.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
