@@ -1,0 +1,16 @@
+{
+    "_default": {
+        "0": {
+            "consumer_key" : ""
+        },
+        "1": {
+            "consumer_secret": ""
+        },
+        "2": {
+            "access_token": ""
+        },
+        "3": {
+            "access_token_secret": ""
+        }
+    }
+}
