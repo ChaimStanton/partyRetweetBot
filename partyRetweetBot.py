@@ -1,12 +1,17 @@
 #! python3
 
-from keysAuthentication import *
-
 import tweepy
 from time import sleep
 
+from tinydb import TinyDB
+
+import sys
+
+keysString = sys.argv[1]
+mpDBstr = sys.argv[2]
 
 def does_have_value(jsonObject, keyvalue):
+    """This is a generic function just to see if a json object exists used to determine if somehting is a retweet"""
     try:
         jsonObject[keyvalue] # see if it exists
         if jsonObject[keyvalue] == None:
@@ -29,9 +34,9 @@ class MyStreamListener(tweepy.StreamListener):
                 print("THIS WAS RETWEETED")
             
             print("text                ", status.text)
-            print("quote retweet:      ", tweet.isQuoteRetweet)
-            print("pure retweet:       ", tweet.isPureRetweet)
-            print("comment tweet:      ", tweet.isComment)
+            print("quote retweet:      ", tweet.isQuoteRetweet) # a retweet with a comment
+            print("pure retweet:       ", tweet.isPureRetweet) # i.e. a pure retweet with no comment
+            print("comment tweet:      ", tweet.isComment) # a retweet that is a retweet of a comment
             print()
 
         except tweepy.TweepError as error:
@@ -56,18 +61,45 @@ class Tweet():
         api.retweet(self.id)
 
 
+# getting authentication from database
+# keysString = "db/libDemKEYS.json"
+db = TinyDB(keysString)
+
+consumer_key = db.all()[0]["consumer_key"]
+consumer_secret = db.all()[1]["consumer_secret"]
+access_token = db.all()[2]["access_token"]
+access_token_secret = db.all()[3]["access_token_secret"]
+
+
 # "new" authenticaiotn
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 
 api = tweepy.API(auth)
 
-users = ["1268410636553371648", "1279585853942239243"]
+# mpDBstr = "db/libDem.json"
+db = TinyDB(mpDBstr) # get the database 
+
+mps = []
+
+for mp in db: # iterates through the database and adds the idstring to a list
+   mps.append(mp["id_str"])
+
+try:
+    for mp in mps: 
+        api.create_friendship(mp) # follows each mp
+except tweepy.error.TweepError:
+    print("already followed")
 
 # creating and initializing the stream
 myStreamListener = MyStreamListener()
 
 myStream = tweepy.Stream(auth=auth, listener=myStreamListener)
 
+print("Starting stream")
 # starting the stream
-myStream.filter(follow=users)
+try:
+    myStream.filter(follow=mps)
+
+except:
+    print ("error")
