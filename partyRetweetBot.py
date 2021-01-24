@@ -24,20 +24,21 @@ def does_have_value(jsonObject, keyvalue):
 class MyStreamListener(tweepy.StreamListener):
     """This is a class for the stream """
     def on_status(self, status):
-        print("\nNEW TWEET")
+        # print("\nNEW TWEET")
         tweet = Tweet(status)
         try:
             if tweet.isComment == True or tweet.isPureRetweet == True:
-                print("NOT RETWETED ")
+                # print("NOT RETWETED ")
+                pass 
             else:
                 tweet.retweet()
-                print("THIS WAS RETWEETED")
+                # print("THIS WAS RETWEETED")
             
-            print("text                ", status.text)
-            print("quote retweet:      ", tweet.isQuoteRetweet) # a retweet with a comment
-            print("pure retweet:       ", tweet.isPureRetweet) # i.e. a pure retweet with no comment
-            print("comment tweet:      ", tweet.isComment) # a retweet that is a retweet of a comment
-            print()
+            # print("text                ", status.text)
+            # print("quote retweet:      ", tweet.isQuoteRetweet) # a retweet with a comment
+            # print("pure retweet:       ", tweet.isPureRetweet) # i.e. a pure retweet with no comment
+            # print("comment tweet:      ", tweet.isComment) # a retweet that is a retweet of a comment
+            # print()
 
         except tweepy.TweepError as error:
             print(error.reason)
