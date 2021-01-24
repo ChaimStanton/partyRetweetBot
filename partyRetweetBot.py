@@ -10,12 +10,13 @@ import sys
 keysString = sys.argv[1]
 mpDBstr = sys.argv[2]
 
+
 def does_have_value(jsonObject, keyvalue):
     """This is a generic function just to see if a json object exists used to determine if somehting is a retweet"""
     try:
-        jsonObject[keyvalue] # see if it exists
-        if jsonObject[keyvalue] == None:
-            return False 
+        jsonObject[keyvalue]  # see if it exists
+        if jsonObject[keyvalue] is None:
+            return False
         return True
     except KeyError:
         return False
@@ -27,13 +28,13 @@ class MyStreamListener(tweepy.StreamListener):
         # print("\nNEW TWEET")
         tweet = Tweet(status)
         try:
-            if tweet.isComment == True or tweet.isPureRetweet == True:
+            if tweet.isComment or tweet.isPureRetweet:
                 # print("NOT RETWETED ")
-                pass 
+                pass
             else:
                 tweet.retweet()
                 # print("THIS WAS RETWEETED")
-            
+
             # print("text                ", status.text)
             # print("quote retweet:      ", tweet.isQuoteRetweet) # a retweet with a comment
             # print("pure retweet:       ", tweet.isPureRetweet) # i.e. a pure retweet with no comment
@@ -55,7 +56,7 @@ class Tweet():
         self.isPureRetweet = does_have_value(statusObj._json, "retweeted_status")
         # a pure retweet is a retweet with no comment
         self.isQuoteRetweet = does_have_value(statusObj._json, "quoted_status")
-        # a quoted tweet is one that has a comment AND a retweet 
+        # a quoted tweet is one that has a comment AND a retweet
         self.isComment = does_have_value(statusObj._json, "in_reply_to_status_id")
 
     def retweet(self):
@@ -79,16 +80,16 @@ auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 
 # mpDBstr = "db/libDem.json"
-db = TinyDB(mpDBstr) # get the database 
+db = TinyDB(mpDBstr)  # get the database 
 
 mps = []
 
-for mp in db: # iterates through the database and adds the idstring to a list
-   mps.append(mp["id_str"])
+for mp in db:  # iterates through the database and adds the idstring to a list
+    mps.append(mp["id_str"])
 
 try:
-    for mp in mps: 
-        api.create_friendship(mp) # follows each mp
+    for mp in mps:
+        api.create_friendship(mp)  # follows each mp
 except tweepy.error.TweepError:
     print("already followed")
 
@@ -103,4 +104,4 @@ try:
     myStream.filter(follow=mps)
 
 except:
-    print ("error")
+    print("error")
