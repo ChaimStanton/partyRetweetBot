@@ -1,6 +1,9 @@
+# stuff I've added in
 .vscode/
 since_id.txt
 tempCodeRunnerFile.py
+# ignore the database
+db/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
