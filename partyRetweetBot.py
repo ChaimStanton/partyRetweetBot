@@ -12,10 +12,12 @@ import logging
 filehandler = logging.FileHandler("db/logs/logs.log", mode="a")
 streamhandler = logging.StreamHandler()
 
-logging.basicConfig(format="%(levelname)s : %(msg)s : %(asctime)s : %(name)s : %(pathname)s : %(lineno)s", 
+logging.basicConfig(format="%(levelname)s : %(msg)s : %(asctime)s : %(name)s ", 
                     level="NOTSET", handlers =(filehandler, streamhandler))
+# : %(pathname)s : %(lineno)s was in format 
 
-logging.info("Start of program")
+
+logging.info("\n \n Start of program")
 
 keysString = sys.argv[1]
 mpDBstr = sys.argv[2]
@@ -34,22 +36,15 @@ def does_have_value(jsonObject, keyvalue):
 
 class MyStreamListener(tweepy.StreamListener):
     """This is a class for the stream """
-    def on_status(self, status):
-        # print("\nNEW TWEET")
+    def on_status(self, status): # when a tweet is recived
         tweet = Tweet(status)
         try:
             if tweet.isComment or tweet.isPureRetweet:
-                # print("NOT RETWETED ")
+                logging.info("NOT RETWEETED " + str(tweet))
                 pass
             else:
                 tweet.retweet()
-                # print("THIS WAS RETWEETED")
-
-            # print("text                ", status.text)
-            # print("quote retweet:      ", tweet.isQuoteRetweet) # a retweet with a comment
-            # print("pure retweet:       ", tweet.isPureRetweet) # i.e. a pure retweet with no comment
-            # print("comment tweet:      ", tweet.isComment) # a retweet that is a retweet of a comment
-            # print()
+                logging.info("RETWEETED " + str(tweet))
 
         except tweepy.TweepError as error:
             print(error.reason)
@@ -63,14 +58,24 @@ class Tweet():
     """ A class for all of the tweets to make life easier """
     def __init__(self, statusObj):
         self.id = statusObj.__dict__["_json"]["id"]
+        self.text = statusObj.text
+
+        #TODO clarify tweet boolean catogories with better comments above 
+
+        
         self.isPureRetweet = does_have_value(statusObj._json, "retweeted_status")
         # a pure retweet is a retweet with no comment
+
         self.isQuoteRetweet = does_have_value(statusObj._json, "quoted_status")
         # a quoted tweet is one that has a comment AND a retweet
+
         self.isComment = does_have_value(statusObj._json, "in_reply_to_status_id")
 
     def retweet(self):
         api.retweet(self.id)
+
+    def __str__(self):
+        return "text : " + self.text + " - isQuoteRetweet : " + str(self.isQuoteRetweet) + " - pure retweet : " + str(self.isPureRetweet) + " - comment tweet : " + str(self.isComment)
 
 
 # getting authentication from database
@@ -114,4 +119,4 @@ try:
     myStream.filter(follow=mps)
 
 except:
-    logging.critical("Error with the stream")
+    logging.exception("Error with the stream")
