@@ -7,6 +7,16 @@ from tinydb import TinyDB
 
 import sys
 
+import logging
+
+filehandler = logging.FileHandler("db/logs/logs.log", mode="a")
+streamhandler = logging.StreamHandler()
+
+logging.basicConfig(format="%(levelname)s : %(msg)s : %(asctime)s : %(name)s : %(pathname)s : %(lineno)s", 
+                    level="NOTSET", handlers =(filehandler, streamhandler))
+
+logging.info("Start of program")
+
 keysString = sys.argv[1]
 mpDBstr = sys.argv[2]
 
@@ -98,10 +108,10 @@ myStreamListener = MyStreamListener()
 
 myStream = tweepy.Stream(auth=auth, listener=myStreamListener)
 
-print("Starting stream")
-# starting the stream
+logging.info("starting stream")
+
 try:
     myStream.filter(follow=mps)
 
 except:
-    print("error")
+    logging.critical("Error with the stream")
