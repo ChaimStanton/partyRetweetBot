@@ -3,8 +3,12 @@
 since_id.txt
 tempCodeRunnerFile.py
 # ignore the database
-db/logs/*
+db/logs/logs.log
 db/party/*
+db/testingKeys/*
+
+#temp code runnerfile
+tempCodeRunnerFile.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

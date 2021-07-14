@@ -59,23 +59,21 @@ class Tweet():
     def __init__(self, statusObj):
         self.id = statusObj.__dict__["_json"]["id"]
         self.text = statusObj.text
-
-        #TODO clarify tweet boolean catogories with better comments above 
-
-        
-        self.isPureRetweet = does_have_value(statusObj._json, "retweeted_status")
+                
         # a pure retweet is a retweet with no comment
+        self.isPureRetweet = does_have_value(statusObj._json, "retweeted_status")
 
+        # A quote retweet is a retweet which the retweeter has added in their own statment. A "quote tweet" as per twitter api 
         self.isQuoteRetweet = does_have_value(statusObj._json, "quoted_status")
-        # a quoted tweet is one that has a comment AND a retweet
 
+        # A comment is a tweet that appears as a comment beneath annother tweet
         self.isComment = does_have_value(statusObj._json, "in_reply_to_status_id")
 
     def retweet(self):
         api.retweet(self.id)
 
     def __str__(self):
-        return "text : " + self.text + " - isQuoteRetweet : " + str(self.isQuoteRetweet) + " - pure retweet : " + str(self.isPureRetweet) + " - comment tweet : " + str(self.isComment)
+        return "text : " + self.text + " - isQuoteRetweet : " + str(self.isQuoteRetweet) + " - isPureRetweet : " + str(self.isPureRetweet) + " - isComment : " + str(self.isComment)
 
 
 # getting authentication from database
