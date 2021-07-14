@@ -6,6 +6,9 @@ tempCodeRunnerFile.py
 db/logs/*
 db/party/*
 
+#temp code runnerfile
+tempCodeRunnerFile.sh
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
