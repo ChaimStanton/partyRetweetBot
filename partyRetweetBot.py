@@ -41,7 +41,7 @@ class MyStreamListener(tweepy.StreamListener):
     def on_status(self, status): # when a tweet is recived
         tweet = Tweet(status)
         try:
-            if tweet.isComment or tweet.isPureRetweet:
+            if tweet.isComment or tweet.isPureRetweet or tweet.isTweetTryingToATsomeone:
                 logging.info("NOT RETWEETED " + str(tweet))
                 pass
             else:
