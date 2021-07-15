@@ -9,6 +9,8 @@ import sys
 
 import logging
 
+import json
+
 filehandler = logging.FileHandler("db/logs/logs.log", mode="a")
 streamhandler = logging.StreamHandler()
 
@@ -39,7 +41,7 @@ class MyStreamListener(tweepy.StreamListener):
     def on_status(self, status): # when a tweet is recived
         tweet = Tweet(status)
         try:
-            if tweet.isComment or tweet.isPureRetweet:
+            if tweet.isComment or tweet.isPureRetweet or tweet.isTweetTryingToATsomeone:
                 logging.info("NOT RETWEETED " + str(tweet))
                 pass
             else:
@@ -59,7 +61,7 @@ class Tweet():
     def __init__(self, statusObj):
         self.id = statusObj.__dict__["_json"]["id"]
         self.text = statusObj.text
-                
+
         # a pure retweet is a retweet with no comment
         self.isPureRetweet = does_have_value(statusObj._json, "retweeted_status")
 
@@ -69,11 +71,20 @@ class Tweet():
         # A comment is a tweet that appears as a comment beneath annother tweet
         self.isComment = does_have_value(statusObj._json, "in_reply_to_status_id")
 
+        if does_have_value(statusObj._json, "in_reply_to_user_id") and not(does_have_value(statusObj._json, "in_reply_to_status_id")):
+            self.isTweetTryingToATsomeone = True 
+            #ie if the tweet starts of with "@ChaimStanton what do you think about x or y bla bla bla" 
+        else:
+            self.isTweetTryingToATsomeone = False
+
+        with open("db/logs/jsonDataFromTweet.json", "a") as jsonDump:
+            jsonDump.write(json.dumps((statusObj._json)))
+
     def retweet(self):
         api.retweet(self.id)
 
     def __str__(self):
-        return "text : " + self.text + " - isQuoteRetweet : " + str(self.isQuoteRetweet) + " - isPureRetweet : " + str(self.isPureRetweet) + " - isComment : " + str(self.isComment)
+        return "text : " + self.text + " - is Tweet trying to @ someone : " + str(self.isTweetTryingToATsomeone) + " - isQuoteRetweet : " + str(self.isQuoteRetweet) + " - isPureRetweet : " + str(self.isPureRetweet) + " - isComment : " + str(self.isComment)
 
 
 # getting authentication from database
