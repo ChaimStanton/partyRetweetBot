@@ -3,7 +3,7 @@
 since_id.txt
 tempCodeRunnerFile.py
 # ignore the database
-db/logs/logs.log
+db/logs/*
 db/party/*
 db/testingKeys/*
 
