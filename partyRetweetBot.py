@@ -77,8 +77,8 @@ class Tweet():
         else:
             self.isTweetTryingToATsomeone = False
 
-        with open("db/logs/jsonDataFromTweet.json", "a") as jsonDump:
-            jsonDump.write(json.dumps((statusObj._json)))
+        # with open("db/logs/jsonDataFromTweet.json", "a") as jsonDump:
+        #     jsonDump.write(json.dumps((statusObj._json)))
 
     def retweet(self):
         api.retweet(self.id)
